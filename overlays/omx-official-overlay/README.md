@@ -30,3 +30,10 @@ This repository stores a sanitized, official-compatible overlay for a customized
 - Files in `overlay/` use `__HOME__` placeholders where the local installation needs user-specific paths. The installer replaces them with the current `$HOME`.
 - Browser-backed MCPs are intentionally independent: Playwright and chrome-devtools use separate browser copies and wrapper scripts.
 - `omx-self-heal` preserves the stable OMX symlink and local compatibility patching without forking the official package in-repo.
+
+## More deployment detail
+
+For a fuller step-by-step deployment and verification guide, see:
+
+- English: [`DEPLOY.md`](./DEPLOY.md)
+- 简体中文: [`DEPLOY.zh.md`](./DEPLOY.zh.md)

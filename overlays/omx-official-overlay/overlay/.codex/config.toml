@@ -1,0 +1,127 @@
+approvals_reviewer = "user"
+developer_instructions = 'You have oh-my-codex installed. AGENTS.md is your orchestration brain and the main orchestration surface. Use skill/keyword routing like $name plus spawned role-specialized subagents for specialized work. Codex native subagents are available via .codex/agents and may be used for independent parallel subtasks within a single session or team pane. Skills are loaded from installed SKILL.md files under .codex/skills, not from native agent TOMLs. Use workflow skills via $name when explicitly invoked or clearly routed by AGENTS.md. Treat installed prompts as narrower internal execution surfaces under AGENTS.md authority, even when user-facing docs prefer $name keywords.'
+disable_response_storage = true
+model = 'gpt-5.4'
+model_auto_compact_token_limit = 900000
+model_context_window = 1000000
+model_instructions_file = '~/.codex/prompts/instruction.md'
+model_provider = 'custom'
+model_reasoning_effort = 'high'
+notify = ['node', '__HOME__/.local/share/omx/current/dist/scripts/notify-hook.js']
+openai_base_url = '<set-your-provider-base-url>'
+service_tier = 'fast'
+
+[agents]
+max_depth = 2
+max_threads = 6
+
+[env]
+USE_OMX_EXPLORE_CMD = '1'
+http_proxy = 'http://127.0.0.1:6984'
+https_proxy = 'http://127.0.0.1:6984'
+HTTP_PROXY = 'http://127.0.0.1:6984'
+HTTPS_PROXY = 'http://127.0.0.1:6984'
+all_proxy = 'socks5h://127.0.0.1:6984'
+ALL_PROXY = 'socks5h://127.0.0.1:6984'
+no_proxy = '127.0.0.1,localhost,::1'
+NO_PROXY = '127.0.0.1,localhost,::1'
+
+[features]
+child_agents_md = true
+codex_hooks = true
+multi_agent = true
+
+[mcp_servers]
+[mcp_servers.MCP_DOCKER]
+command = 'docker'
+args = ['mcp', 'gateway', 'run']
+startup_timeout_sec = 30
+
+[mcp_servers.MCP_DOCKER.env]
+DOCKER_MCP_IN_CONTAINER = '1'
+http_proxy = 'http://127.0.0.1:6984'
+https_proxy = 'http://127.0.0.1:6984'
+HTTP_PROXY = 'http://127.0.0.1:6984'
+HTTPS_PROXY = 'http://127.0.0.1:6984'
+all_proxy = 'socks5h://127.0.0.1:6984'
+ALL_PROXY = 'socks5h://127.0.0.1:6984'
+no_proxy = '127.0.0.1,localhost,::1'
+NO_PROXY = '127.0.0.1,localhost,::1'
+
+[mcp_servers.chrome-devtools]
+command = '__HOME__/.local/bin/codex-chrome-devtools-mcp'
+startup_timeout_sec = 30
+
+[mcp_servers.filesystem]
+args = ['/mnt/d/predicateNBAprice4.0', '__HOME__']
+command = '__HOME__/.local/share/codex-mcp-tools/node_modules/.bin/mcp-server-filesystem'
+startup_timeout_sec = 15
+
+[mcp_servers.github]
+bearer_token_env_var = 'GITHUB_PAT_TOKEN'
+url = 'https://api.githubcopilot.com/mcp/'
+
+[mcp_servers.omx_code_intel]
+args = ['__HOME__/.local/share/omx/current/dist/mcp/code-intel-server.js']
+command = 'node'
+enabled = true
+startup_timeout_sec = 10
+
+[mcp_servers.omx_memory]
+args = ['__HOME__/.local/share/omx/current/dist/mcp/memory-server.js']
+command = 'node'
+enabled = true
+startup_timeout_sec = 5
+
+[mcp_servers.omx_state]
+args = ['__HOME__/.local/share/omx/current/dist/mcp/state-server.js']
+command = 'node'
+enabled = true
+startup_timeout_sec = 5
+
+[mcp_servers.omx_state.tools]
+[mcp_servers.omx_state.tools.state_list_active]
+approval_mode = 'approve'
+
+[mcp_servers.omx_trace]
+args = ['__HOME__/.local/share/omx/current/dist/mcp/trace-server.js']
+command = 'node'
+enabled = true
+startup_timeout_sec = 5
+
+[mcp_servers.omx_wiki]
+args = ['__HOME__/.local/share/omx/current/dist/mcp/wiki-server.js']
+command = 'node'
+enabled = true
+startup_timeout_sec = 5
+
+[mcp_servers.playwright]
+command = '__HOME__/.local/bin/codex-playwright-mcp'
+startup_timeout_sec = 30
+
+[mcp_servers.sequential-thinking]
+command = '__HOME__/.local/share/codex-mcp-tools/node_modules/.bin/mcp-server-sequential-thinking'
+startup_timeout_sec = 15
+
+[model_providers]
+[model_providers.custom]
+base_url = '<set-your-provider-base-url>'
+name = 'custom'
+requires_openai_auth = true
+wire_api = 'responses'
+
+[projects]
+[projects.'__HOME__/.codex/prompts']
+trust_level = 'trusted'
+
+[projects.'/mnt/d/human_robot']
+trust_level = 'trusted'
+
+[projects.'/mnt/d/predicateNBAprice4.0']
+trust_level = 'trusted'
+
+[projects."__HOME__"]
+trust_level = "trusted"
+
+[tui]
+status_line = ['model-with-reasoning', 'git-branch', 'context-remaining', 'total-input-tokens', 'total-output-tokens', 'five-hour-limit', 'weekly-limit']

@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+OMX_LINK="$HOME/.local/share/omx/current"
+GLOBAL_ROOT="$(npm root -g 2>/dev/null || true)"
+TARGET="${GLOBAL_ROOT:+$GLOBAL_ROOT/oh-my-codex}"
+
+if [ -z "$TARGET" ] || [ ! -d "$TARGET" ]; then
+  exit 0
+fi
+
+mkdir -p "$(dirname "$OMX_LINK")"
+if [ "$(readlink -f "$OMX_LINK" 2>/dev/null || true)" != "$TARGET" ]; then
+  ln -sfn "$TARGET" "$OMX_LINK"
+fi
+
+for helper in \
+  "$HOME/.local/bin/codex-playwright-mcp" \
+  "$HOME/.local/bin/codex-chrome-devtools-mcp" \
+  "$HOME/.local/bin/codex-refresh-playwright-browser" \
+  "$HOME/.local/bin/codex-refresh-chrome-devtools-browser"; do
+  [ -e "$helper" ] && chmod 755 "$helper" >/dev/null 2>&1 || true
+done
+
+python3 - "$TARGET" <<'PY'
+from pathlib import Path
+import sys
+
+base = Path(sys.argv[1])
+
+PATCHES = [
+    (
+        base / 'src/scripts/codex-native-pre-post.ts',
+        "function containsHardFailure(text: string): boolean {\n  return /command not found|permission denied|no such file or directory/i.test(text);\n}\n\n",
+        "export function buildNativePostToolUseOutput(\n",
+        "function commandFailed(exitCode: number | null): boolean {\n  return exitCode !== null && exitCode !== 0;\n}\n\n",
+    ),
+    (
+        base / 'dist/scripts/codex-native-pre-post.js',
+        "function containsHardFailure(text) {\n    return /command not found|permission denied|no such file or directory/i.test(text);\n}\n",
+        "export function buildNativePostToolUseOutput(payload) {\n",
+        "function commandFailed(exitCode) {\n    return exitCode !== null && exitCode !== 0;\n}\n",
+    ),
+]
+
+for path, marker, export_sig, patch_fn in PATCHES:
+    if not path.exists():
+        continue
+    text = path.read_text()
+    if 'function commandFailed' in text and 'containsHardFailure(combined) && commandFailed(normalized.exitCode)' in text:
+        continue
+    if 'function commandSucceeded' in text and '!commandSucceeded(normalized.exitCode)' in text:
+        text = text.replace('function commandSucceeded(exitCode: number | null): boolean {\n  return exitCode === 0;\n}\n' if path.suffix == '.ts' else 'function commandSucceeded(exitCode) {\n    return exitCode === 0;\n}\n', patch_fn)
+        text = text.replace('containsHardFailure(combined) && !commandSucceeded(normalized.exitCode)', 'containsHardFailure(combined) && commandFailed(normalized.exitCode)')
+        path.write_text(text)
+        continue
+    original = marker + export_sig
+    if original in text:
+        text = text.replace(original, marker + patch_fn + export_sig, 1)
+        text = text.replace('if (containsHardFailure(combined)) {', 'if (containsHardFailure(combined) && commandFailed(normalized.exitCode)) {', 1)
+        path.write_text(text)
+PY

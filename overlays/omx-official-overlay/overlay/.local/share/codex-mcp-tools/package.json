@@ -1,0 +1,13 @@
+{
+  "name": "codex-mcp-tools",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Pinned local MCP toolchain for Codex/OMX",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@modelcontextprotocol/server-filesystem": "2026.1.14",
+    "@modelcontextprotocol/server-sequential-thinking": "2025.12.18",
+    "@playwright/mcp": "0.0.70",
+    "chrome-devtools-mcp": "0.21.0"
+  }
+}

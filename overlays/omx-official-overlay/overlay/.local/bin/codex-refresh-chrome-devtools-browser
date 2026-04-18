@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SRC_BASE="$HOME/.cache/ms-playwright"
+TARGET_BASE="$HOME/.local/opt/chrome-devtools-browser"
+TARGET_CURRENT="$TARGET_BASE/current"
+TMP_DIR="$TARGET_BASE/.tmp-current"
+SOURCE_MARKER="$TARGET_BASE/source-path.txt"
+
+src="$(find "$SRC_BASE" -maxdepth 3 -type f -path '*/chrome-linux64/chrome' | sort -V | tail -n 1)"
+if [ -z "$src" ]; then
+  echo "No Playwright Chromium binary found under $SRC_BASE" >&2
+  exit 1
+fi
+
+src_dir="$(dirname "$src")"
+mkdir -p "$TARGET_BASE"
+rm -rf "$TMP_DIR"
+mkdir -p "$TMP_DIR"
+cp -a "$src_dir" "$TMP_DIR/chrome-linux64"
+rm -rf "$TARGET_CURRENT"
+mv "$TMP_DIR" "$TARGET_CURRENT"
+printf '%s\n' "$src" > "$SOURCE_MARKER"
+printf '%s\n' "$TARGET_CURRENT/chrome-linux64/chrome"

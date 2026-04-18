@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TOOLS_DIR="$HOME/.local/share/codex-mcp-tools"
+LIB_DIR="$HOME/.local/opt/browser-libs/usr/lib/x86_64-linux-gnu"
+PROXY_SERVER="${HTTP_PROXY:-http://127.0.0.1:6984}"
+PROXY_BYPASS="${NO_PROXY:-127.0.0.1,localhost,::1}"
+BROWSER="$HOME/.local/opt/chrome-devtools-browser/current/chrome-linux64/chrome"
+SOURCE_MARKER="$HOME/.local/opt/chrome-devtools-browser/source-path.txt"
+latest_source="$(find "$HOME/.cache/ms-playwright" -maxdepth 3 -type f -path '*/chrome-linux64/chrome' | sort -V | tail -n 1)"
+current_source="$(cat "$SOURCE_MARKER" 2>/dev/null || true)"
+
+if [ ! -x "$BROWSER" ] || { [ -n "$latest_source" ] && [ "$latest_source" != "$current_source" ]; }; then
+  "$HOME/.local/bin/codex-refresh-chrome-devtools-browser" >/dev/null
+fi
+
+if [ ! -x "$BROWSER" ]; then
+  echo "Dedicated chrome-devtools browser is unavailable: $BROWSER" >&2
+  exit 1
+fi
+
+if [ -d "$LIB_DIR" ]; then
+  export LD_LIBRARY_PATH="$LIB_DIR${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+fi
+
+exec "$TOOLS_DIR/node_modules/.bin/chrome-devtools-mcp" \
+  --headless \
+  --isolated \
+  --no-usage-statistics \
+  --no-performance-crux \
+  --executablePath="$BROWSER" \
+  --proxyServer="$PROXY_SERVER" \
+  --chromeArg=--no-sandbox \
+  --chromeArg=--disable-dev-shm-usage \
+  --chromeArg=--proxy-bypass-list="$PROXY_BYPASS" \
+  "$@"

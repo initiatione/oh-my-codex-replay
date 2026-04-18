@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+TOOLS_DIR="$HOME/.local/share/codex-mcp-tools"
+LIB_DIR="$HOME/.local/opt/browser-libs/usr/lib/x86_64-linux-gnu"
+PROXY_SERVER="${HTTP_PROXY:-http://127.0.0.1:6984}"
+PROXY_BYPASS="${NO_PROXY:-127.0.0.1,localhost,::1}"
+
+browser="$HOME/.local/opt/playwright-browser/current/chrome-linux64/chrome"
+SOURCE_MARKER="$HOME/.local/opt/playwright-browser/source-path.txt"
+latest_source="$(find "$HOME/.cache/ms-playwright" -maxdepth 3 -type f -path '*/chrome-linux64/chrome' | sort -V | tail -n 1)"
+current_source="$(cat "$SOURCE_MARKER" 2>/dev/null || true)"
+if [ ! -x "$browser" ] || { [ -n "$latest_source" ] && [ "$latest_source" != "$current_source" ]; }; then
+  "$HOME/.local/bin/codex-refresh-playwright-browser" >/dev/null
+fi
+if [ ! -x "$browser" ]; then
+  echo "Dedicated Playwright browser is unavailable: $browser" >&2
+  exit 1
+fi
+
+if [ -d "$LIB_DIR" ]; then
+  export LD_LIBRARY_PATH="$LIB_DIR${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+fi
+
+exec "$TOOLS_DIR/node_modules/.bin/playwright-mcp" \
+  --headless \
+  --isolated \
+  --no-sandbox \
+  --executable-path="$browser" \
+  --proxy-server="$PROXY_SERVER" \
+  --proxy-bypass="$PROXY_BYPASS" \
+  "$@"

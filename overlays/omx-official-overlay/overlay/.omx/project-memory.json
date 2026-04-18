@@ -1,0 +1,65 @@
+{
+  "directives": [
+    {
+      "directive": "On WSL, configure MCP servers through stable local wrappers and symlinks under ~/.local rather than @latest commands or versioned NVM paths; keep Playwright and chrome-devtools browser runtimes independent and self-healing.",
+      "priority": "high",
+      "context": "MCP environment hardening from WSL stabilization session.",
+      "timestamp": "2026-04-18T18:42:52.182Z"
+    },
+    {
+      "directive": "Default coding behavior should follow the karpathy-guidelines style: surface assumptions before coding, prefer the simplest sufficient implementation, make surgical changes only, and define verification goals before editing.",
+      "priority": "high",
+      "context": "Integrated into Codex global instruction prompt and executor prompt on 2026-04-19.",
+      "timestamp": "2026-04-18T18:52:05.238Z"
+    },
+    {
+      "directive": "Karpathy-style rules are the default for normal coding, but refactor/cleanup/deslop/architecture tasks must allow bounded structural changes, necessary abstractions, and optimization for the simplest resulting architecture rather than the smallest diff.",
+      "priority": "high",
+      "context": "Prompt integration refinement on 2026-04-19.",
+      "timestamp": "2026-04-18T18:56:41.059Z"
+    },
+    {
+      "directive": "For ordinary development tasks, optimize for the best result within the approved scope. Treat smallest-diff and surgical-edit guidance as risk-control heuristics, not as the primary goal.",
+      "priority": "high",
+      "context": "Prompt refinement on 2026-04-19 after clarifying that normal tasks also require optimal outcomes.",
+      "timestamp": "2026-04-18T18:58:37.655Z"
+    }
+  ],
+  "notes": [
+    {
+      "category": "env",
+      "content": "WSL MCP networking depends on the local proxy at 127.0.0.1:6984 plus mirrored networking/autoProxy. Load proxy env and GITHUB_PAT_TOKEN from ~/.profile; GitHub remote MCP startup/auth succeeds when those vars are present.",
+      "timestamp": "2026-04-18T18:42:52.204Z"
+    },
+    {
+      "category": "architecture",
+      "content": "Pinned MCP toolchain lives under ~/.local/share/codex-mcp-tools. Stable OMX path lives under ~/.local/share/omx/current. Browser-backed MCPs use dedicated wrappers in ~/.local/bin and dedicated browser copies under ~/.local/opt/playwright-browser/current and ~/.local/opt/chrome-devtools-browser/current.",
+      "timestamp": "2026-04-18T18:42:52.213Z"
+    },
+    {
+      "category": "conventions",
+      "content": "Installed skill ~/.codex/skills/karpathy-guidelines from multica-ai/andrej-karpathy-skills and merged its core rules into ~/.codex/prompts/instruction.md and ~/.codex/prompts/executor.md so future development defaults to that style even without explicit skill invocation.",
+      "timestamp": "2026-04-18T18:52:05.243Z"
+    },
+    {
+      "category": "conventions",
+      "content": "Refactor-mode exception: keep assumption surfacing and verification-first discipline, but for cleanup/refactor work prefer a plan, lock behavior with tests or concrete before/after checks when practical, and permit cross-file restructuring within the approved scope.",
+      "timestamp": "2026-04-18T18:56:41.286Z"
+    },
+    {
+      "category": "conventions",
+      "content": "Updated default coding prompts so ordinary tasks target the best verified outcome within scope, while simplicity and surgical edits remain constraints on risk and unnecessary change. Refactor tasks still retain explicit bounded-structural-change exceptions.",
+      "timestamp": "2026-04-18T18:58:37.793Z"
+    },
+    {
+      "category": "conventions",
+      "content": "Synced the best-result-within-scope rule into planner, test-engineer, and code-simplifier prompts. Planning now optimizes for the best executable outcome, testing for the strongest confidence gain within scope, and simplification for the clearest resulting code rather than the smallest diff.",
+      "timestamp": "2026-04-18T19:00:41.597Z"
+    },
+    {
+      "category": "conventions",
+      "content": "Lightly synced the best-result-within-scope rule into debugger and architect prompts without changing their core roles: debugger now prefers the strongest grounded root-cause fix within scope, and architect now prefers the best grounded recommendation within scope while still staying read-only and evidence-first.",
+      "timestamp": "2026-04-18T19:03:05.356Z"
+    }
+  ]
+}
